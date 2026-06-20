@@ -1,5 +1,3 @@
 #pragma once
-
-namespace Enxy::UI {  
-    void Initialize();  
-}  
+void InitializeUI();
+void ToggleUI();
