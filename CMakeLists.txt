@@ -1,14 +1,14 @@
-if(NOT DEFINED ENV{COMMONLIB_SSE_FOLDER})
-  message(FATAL_ERROR "Missing COMMONLIB_SSE_FOLDER environment variable")
-endif()
+#if(NOT DEFINED ENV{COMMONLIB_SSE_FOLDER})
+#  message(FATAL_ERROR "Missing COMMONLIB_SSE_FOLDER environment variable")
+#endif()
 
-if(NOT DEFINED ENV{VCPKG_ROOT})
-    message(FATAL_ERROR "Missing VCPKG_ROOT environment variable")
-endif()
+#if(NOT DEFINED ENV{VCPKG_ROOT})
+#    message(FATAL_ERROR "Missing VCPKG_ROOT environment variable")
+#endif()
 
 cmake_minimum_required(VERSION 3.21)
 
-project(EnxyWidget3 VERSION 1.0.0 LANGUAGES CXX)  
+project(EnxyWidget4 VERSION 1.0.0 LANGUAGES CXX)  
 set(VCPKG_TARGET_TRIPLET "x64-windows-static-md")
 
 if(DEFINED ENV{SKYRIM_FOLDER} AND IS_DIRECTORY "$ENV{SKYRIM_FOLDER}/Data")  
@@ -24,8 +24,8 @@ add_commonlibsse_plugin(${PROJECT_NAME}
     SOURCES   
     src/Plugin.cpp  
     src/Config.cpp  
-    src/Ui.cpp  
-    src/Widget.cpp
+    src/UIManager.cpp  
+    src/Logger.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE include)
