@@ -1,13 +1,21 @@
+// Config.cpp
 #include "Config.h"
+#include "UIManager.h"
 
-#include "PCH.h"
+using namespace Enxytemp::Config;
 
-PRISMA_UI_API::IVPrismaUI1* PrismaUI = nullptr;
-bool g_uiVisible = false;
-PrismaView g_view = 0;
+InputHandler* InputHandler::GetSingleton() {
+    static InputHandler instance;
+    return &instance;
+}
 
-void InGameLog(const char* msg) {
-    if (RE::ConsoleLog::GetSingleton()) {
-        RE::ConsoleLog::GetSingleton()->Print(msg);
+RE::BSEventNotifyControl InputHandler::ProcessEvent(RE::InputEvent* const* a_events, RE::BSTEventSource<RE::InputEvent*>*) {
+    if (!a_events) return RE::BSEventNotifyControl::kContinue;
+    for (auto event = *a_events; event; event = event->next) {
+        auto button = event->AsButtonEvent();
+        if (button && button->IsDown() && button->GetDevice() == RE::INPUT_DEVICE::kKeyboard && button->GetIDCode() == hotkey) {
+            UIManager::Toggle();
+        }
     }
+    return RE::BSEventNotifyControl::kContinue;
 }
