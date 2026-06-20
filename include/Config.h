@@ -1,8 +1,14 @@
+// Config.h
 #pragma once
-#include "PrismaUI_API.h"
+#include "PCH.h"
 
-extern PRISMA_UI_API::IVPrismaUI1* PrismaUI;
-extern bool g_uiVisible;
-extern PrismaView g_view;
+namespace Enxytemp::Config {
+    inline bool g_uiVisible = false;
+    inline uint32_t hotkey = 0x40; // F6
 
-void InGameLog(const char* msg);
+    class InputHandler : public RE::BSTEventSink<RE::InputEvent*> {
+    public:
+        static InputHandler* GetSingleton();
+        RE::BSEventNotifyControl ProcessEvent(RE::InputEvent* const* a_events, RE::BSTEventSource<RE::InputEvent*>*) override;
+    };
+}
