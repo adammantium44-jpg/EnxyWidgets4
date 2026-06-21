@@ -12,6 +12,8 @@ public:
     void Toggle();
     void HandleInput(uint32_t keyCode);
 
+    static void OnToggleHUD(const char* argument);
+
 private:
     PRISMA_UI_API::IVPrismaUI1* _api = nullptr;
     PrismaView _menuView = 0;

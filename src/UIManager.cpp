@@ -1,16 +1,14 @@
 #include "UIManager.h"
-#include "HUD.h" // Jangan lupa include ini
+
 #include "Config.h"
+#include "HUD.h"
 #include "Logger.h"
 
-
-void UIManager::HandleInput(uint32_t keyCode) {
-    if (keyCode == Config::ToggleKey) {
-        Toggle();
-    }
+// Fungsi statis ini yang bakal dipanggil oleh PrismaUI
+void UIManager::OnToggleHUD(const char* argument) {
+    std::string arg(argument);
+    HUD::Get().SetVisible(arg == "true");
 }
-
-// ... sisanya fungsi Init() dan Toggle() yang tadi ...
 
 void UIManager::Init() {
     _api = PRISMA_UI_API::RequestPluginAPI<PRISMA_UI_API::IVPrismaUI1>();
@@ -22,14 +20,16 @@ void UIManager::Init() {
     _menuView = _api->CreateView(Config::UIRootPath);
     _api->Hide(_menuView);
 
-    // KUNCI: RegisterJSListener untuk menangkap pesan dari JS
-    _api->RegisterJSListener(_menuView, "toggleHUD", [](const char* argument) {
-        std::string arg(argument);
-        // Kalau JS kirim "true", maka show. Kalau "false", maka hide.
-        HUD::Get().SetVisible(arg == "true");
-    });
+    // Sekarang pakai pointer fungsi statis, tanpa [this]
+    _api->RegisterJSListener(_menuView, "toggleHUD", &UIManager::OnToggleHUD);
 
     Log::Info("UI Initialized & Listener Registered");
+}
+
+void UIManager::HandleInput(uint32_t keyCode) {
+    if (keyCode == Config::ToggleKey) {
+        Toggle();
+    }
 }
 
 void UIManager::Toggle() {

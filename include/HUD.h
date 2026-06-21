@@ -8,7 +8,7 @@ public:
         static HUD instance;
         return instance;
     }
-    void Init();
+    void Init(PRISMA_UI_API::IVPrismaUI1* api);  // Terima API dari UIManager
     void SetVisible(bool show);
 
 private:

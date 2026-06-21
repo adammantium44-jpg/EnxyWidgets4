@@ -25,8 +25,11 @@ public:
 
 static void SKSEMessageHandler(SKSE::MessagingInterface::Message* message) {
     if (message->type == SKSE::MessagingInterface::kDataLoaded) {
+
+        auto api = PRISMA_UI_API::RequestPluginAPI<PRISMA_UI_API::IVPrismaUI1>();
+
         UIManager::Get().Init();
-        HUD::Get().Init();
+        HUD::Get().Init(api);
         RE::BSInputDeviceManager::GetSingleton()->AddEventSink(InputHandler::GetSingleton());
     }
 }
