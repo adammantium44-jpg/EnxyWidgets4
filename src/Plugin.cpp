@@ -1,7 +1,7 @@
 #include "Config.h"
 #include "HUD.h"
 #include "UIManager.h"
-#include "logger.h"  // Pakai lowercase sesuai nama file headermu yang isi SetupLog()
+#include "Logger.h"  // Pakai lowercase sesuai nama file headermu yang isi SetupLog()
 
 // Global variable untuk menyimpan alamat fungsi vanilla asli (untuk kebutuhan Hook)
 static uintptr_t g_VanillaFuncPtr = 0;
