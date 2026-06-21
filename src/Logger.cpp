@@ -1,25 +1,30 @@
 #include "Logger.h"
 
-void Enxytemp::Logger::InGameLog(const char* msg) {
-    if (RE::ConsoleLog::GetSingleton()) RE::ConsoleLog::GetSingleton()->Print(msg);
-}
+#include <spdlog/sinks/basic_file_sink.h>
 
-void Enxytemp::Logger::Info(const std::string& msg) {
-    SKSE::log::info(msg);
-}
+void Log::Setup(const char* pluginName) {
+    auto logDir = SKSE::log::log_directory();
+    if (!logDir) return;
 
-void Enxytemp::Logger::Setup() {
-    auto logsFolder = SKSE::log::log_directory();
-    auto pluginName = SKSE::PluginDeclaration::GetSingleton()->GetName();
-    auto logFilePath = *logsFolder / std::format("{}.log", pluginName);
+    auto logFilePath = *logDir / std::format("{}.log", pluginName);
+    auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logFilePath.string(), true);
+    auto logger = std::make_shared<spdlog::logger>(pluginName, std::move(fileSink));
 
-    std::vector<spdlog::sink_ptr> sinks{
-        std::make_shared<spdlog::sinks::basic_file_sink_mt>(logFilePath.string(), true),
-        std::make_shared<spdlog::sinks::msvc_sink_mt>()
-    };
-
-    auto logger = std::make_shared<spdlog::logger>(pluginName, sinks.begin(), sinks.end());
     logger->set_level(spdlog::level::info);
     logger->flush_on(spdlog::level::info);
-    spdlog::set_default_logger(logger);
+    spdlog::set_default_logger(std::move(logger));
+}
+
+void Log::Info(const std::string& msg) {
+    SKSE::log::info("{}", msg);
+    if (auto console = RE::ConsoleLog::GetSingleton()) {
+        console->Print(msg.c_str());
+    }
+}
+
+void Log::Error(const std::string& msg) {
+    SKSE::log::error("{}", msg);
+    if (auto console = RE::ConsoleLog::GetSingleton()) {
+        console->Print(("ERROR: " + msg).c_str());
+    }
 }

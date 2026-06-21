@@ -1,10 +1,10 @@
-#if(NOT DEFINED ENV{COMMONLIB_SSE_FOLDER})
-#  message(FATAL_ERROR "Missing COMMONLIB_SSE_FOLDER environment variable")
-#endif()
+if(NOT DEFINED ENV{COMMONLIB_SSE_FOLDER})
+  message(FATAL_ERROR "Missing COMMONLIB_SSE_FOLDER environment variable")
+endif()
 
-#if(NOT DEFINED ENV{VCPKG_ROOT})
-#    message(FATAL_ERROR "Missing VCPKG_ROOT environment variable")
-#endif()
+if(NOT DEFINED ENV{VCPKG_ROOT})
+    message(FATAL_ERROR "Missing VCPKG_ROOT environment variable")
+endif()
 
 cmake_minimum_required(VERSION 3.21)
 
@@ -26,6 +26,7 @@ add_commonlibsse_plugin(${PROJECT_NAME}
     src/Config.cpp  
     src/UIManager.cpp  
     src/Logger.cpp
+    src/HUD.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE include)

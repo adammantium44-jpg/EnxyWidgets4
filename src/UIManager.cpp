@@ -1,33 +1,46 @@
-// UIManager.cpp
-#include "PCH.h"
 #include "UIManager.h"
-#include "Logger.h"
+#include "HUD.h" // Jangan lupa include ini
 #include "Config.h"
+#include "Logger.h"
 
-void Enxytemp::UIManager::Initialize() {
-    if (!PrismaUI) return;
-    g_view = PrismaUI->CreateView("EnxyAbilities/setting.html");
 
-    if (!PrismaUI->IsValid(g_view)) {
-        Logger::InGameLog(">>> VIEW INVALID");
-        return;
+void UIManager::HandleInput(uint32_t keyCode) {
+    if (keyCode == Config::ToggleKey) {
+        Toggle();
     }
-    PrismaUI->Hide(g_view);
-    Logger::Info("UI initialized");
 }
 
-void Enxytemp::UIManager::Toggle() {
-    if (!PrismaUI || !PrismaUI->IsValid(g_view)) return;
+// ... sisanya fungsi Init() dan Toggle() yang tadi ...
 
-    if (Enxytemp::Config::g_uiVisible) {
-        PrismaUI->Hide(g_view);
-        PrismaUI->Unfocus(g_view);
-        Enxytemp::Config::g_uiVisible = false;
-        Logger::InGameLog("UI HIDDEN");
+void UIManager::Init() {
+    _api = PRISMA_UI_API::RequestPluginAPI<PRISMA_UI_API::IVPrismaUI1>();
+    if (!_api) {
+        Log::Error("PrismaUI API Failed");
+        return;
+    }
+
+    _menuView = _api->CreateView(Config::UIRootPath);
+    _api->Hide(_menuView);
+
+    // KUNCI: RegisterJSListener untuk menangkap pesan dari JS
+    _api->RegisterJSListener(_menuView, "toggleHUD", [](const char* argument) {
+        std::string arg(argument);
+        // Kalau JS kirim "true", maka show. Kalau "false", maka hide.
+        HUD::Get().SetVisible(arg == "true");
+    });
+
+    Log::Info("UI Initialized & Listener Registered");
+}
+
+void UIManager::Toggle() {
+    if (!_api || !_api->IsValid(_menuView)) return;
+
+    _visible = !_visible;
+    if (_visible) {
+        _api->Show(_menuView);
+        _api->Focus(_menuView, false);
     } else {
-        PrismaUI->Show(g_view);
-        PrismaUI->Focus(g_view, false);
-        Enxytemp::Config::g_uiVisible = true;
-        Logger::InGameLog("UI SHOWN");
+        _api->Hide(_menuView);
+        _api->Unfocus(_menuView);
     }
 }

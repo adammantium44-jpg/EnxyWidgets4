@@ -1,9 +1,8 @@
-// Logger.h
 #pragma once
-#include "PCH.h"
+#include <string>
 
-namespace Enxytemp::Logger {
-    void InGameLog(const char* msg);
+namespace Log {
+    void Setup(const char* pluginName);  // Fungsi untuk inisialisasi awal
     void Info(const std::string& msg);
-    void Setup();
+    void Error(const std::string& msg);
 }
