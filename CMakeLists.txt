@@ -8,7 +8,12 @@ endif()
 
 cmake_minimum_required(VERSION 3.21)
 
-project(EnxyWidget4 VERSION 1.0.0 LANGUAGES CXX)  
+#project(EnxyWidget4 VERSION 1.0.0 LANGUAGES CXX) 
+
+set(AUTHOR_NAME "Enxy")
+set(PRODUCT_NAME "EnxyWidgets4")
+project(${PRODUCT_NAME} VERSION 0.1.0.0 LANGUAGES CXX)
+
 set(VCPKG_TARGET_TRIPLET "x64-windows-static-md")
 
 if(DEFINED ENV{SKYRIM_FOLDER} AND IS_DIRECTORY "$ENV{SKYRIM_FOLDER}/Data")  
@@ -21,11 +26,9 @@ endif()
 
 find_package(CommonLibSSE CONFIG REQUIRED)  
 add_commonlibsse_plugin(${PROJECT_NAME}   
-    SOURCES   
+    SOURCES     
     src/Plugin.cpp  
-    src/Config.cpp  
     src/UIManager.cpp  
-    src/Logger.cpp
     src/HUD.cpp
 )
 

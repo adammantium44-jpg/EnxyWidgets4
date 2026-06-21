@@ -1,0 +1,51 @@
+#include "Config.h"
+#include "HUD.h"
+#include "UIManager.h"
+#include "logger.h"  // Pakai lowercase sesuai nama file headermu yang isi SetupLog()
+
+// Class simple untuk handle input keyboard
+class InputHandler : public RE::BSTEventSink<RE::InputEvent*> {
+public:
+    static InputHandler* GetSingleton() {
+        static InputHandler instance;
+        return &instance;
+    }
+
+    RE::BSEventNotifyControl ProcessEvent(RE::InputEvent* const* a_events,
+                                          RE::BSTEventSource<RE::InputEvent*>*) override {
+        for (auto event = *a_events; event; event = event->next) {
+            auto button = event->AsButtonEvent();
+            if (button && button->IsDown() && button->GetDevice() == RE::INPUT_DEVICE::kKeyboard) {
+                UIManager::Get().HandleInput(button->GetIDCode());
+            }
+        }
+        return RE::BSEventNotifyControl::kContinue;
+    }
+};
+
+static void SKSEMessageHandler(SKSE::MessagingInterface::Message* message) {
+    if (message->type == SKSE::MessagingInterface::kDataLoaded) {
+        auto api = PRISMA_UI_API::RequestPluginAPI<PRISMA_UI_API::IVPrismaUI1>();
+
+        UIManager::Get().Init();
+        HUD::Get().Init(api);
+
+        // Daftarkan input handler ke device manager Skyrim
+        RE::BSInputDeviceManager::GetSingleton()->AddEventSink(InputHandler::GetSingleton());
+        logger::info("InputHandler Event Sink successfully registered.");
+    }
+}
+
+// Entry point SKSEPluginLoad
+SKSEPluginLoad(const SKSE::LoadInterface* skse) {
+    SKSE::Init(skse);
+
+    // Panggil fungsi logger header-only kamu di sini
+    SetupLog();
+
+    // Pakai logger::info sesuai alias namespace di pch.h kamu
+    logger::info("--- SKSE PLUGIN LOADED - TES AWAL ---");
+
+    SKSE::GetMessagingInterface()->RegisterListener(SKSEMessageHandler);
+    return true;
+}

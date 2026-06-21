@@ -2,34 +2,39 @@
 
 #include "Config.h"
 #include "HUD.h"
-#include "Logger.h"
+#include "logger.h"  // Include header log kamu yang isi SetupLog() tadi
 
-// Fungsi statis ini yang bakal dipanggil oleh PrismaUI
-void UIManager::OnToggleHUD(const char* argument) {
-    std::string arg(argument);
-    HUD::Get().SetVisible(arg == "true");
+void UIManager::HandleInput(uint32_t keyCode) {
+    if (keyCode == Config::ToggleKey) {
+        logger::info("Toggle key pressed!");
+        Toggle();
+    }
+}
+
+void UIManager::OnSetConfig(const char* argument) {
+    std::string cmd(argument);
+    size_t pos = cmd.find(':');
+    if (pos != std::string::npos) {
+        std::string key = cmd.substr(0, pos);
+        std::string val = cmd.substr(pos + 1);
+
+        // Pakai {} karena logger::info kamu dapet support std::format dari spdlog
+        logger::info("Config received: {} = {}", key, val);
+    }
 }
 
 void UIManager::Init() {
     _api = PRISMA_UI_API::RequestPluginAPI<PRISMA_UI_API::IVPrismaUI1>();
     if (!_api) {
-        Log::Error("PrismaUI API Failed");
+        logger::error("PrismaUI API FAILED to initialize!");
         return;
     }
 
     _menuView = _api->CreateView(Config::UIRootPath);
+    _api->RegisterJSListener(_menuView, "setConfig", &UIManager::OnSetConfig);
     _api->Hide(_menuView);
 
-    // Sekarang pakai pointer fungsi statis, tanpa [this]
-    _api->RegisterJSListener(_menuView, "toggleHUD", &UIManager::OnToggleHUD);
-
-    Log::Info("UI Initialized & Listener Registered");
-}
-
-void UIManager::HandleInput(uint32_t keyCode) {
-    if (keyCode == Config::ToggleKey) {
-        Toggle();
-    }
+    logger::info("UIManager Initialized successfully.");
 }
 
 void UIManager::Toggle() {
@@ -37,9 +42,11 @@ void UIManager::Toggle() {
 
     _visible = !_visible;
     if (_visible) {
+        logger::info("Showing Menu UI");
         _api->Show(_menuView);
         _api->Focus(_menuView, false);
     } else {
+        logger::info("Hiding Menu UI");
         _api->Hide(_menuView);
         _api->Unfocus(_menuView);
     }
